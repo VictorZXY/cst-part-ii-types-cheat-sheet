@@ -65,7 +65,7 @@ Types   & $T$ & $::=$ & $1\ |\ 0\ |\ T_1\times T_2\ |\ T_1+T_2\ |\ T_1\to T_2$\\
 Terms   & $e$ & $::=$ & $x\ |\ \langle\rangle\ |\ \langle e_1,e_2\rangle\ |\ \textsf{fst }e\ |\ \textsf{snd }e\ |\ \textsf{L }e\ |\ \textsf{R }e\ |\ \textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2)$\\ 
         & {}  & $|$   & $\lambda x:T.\ e\ |\ e_1\ e_2\ |\ \textsf{abort}$\\[0.5em]
 Values  & $v$ & $::=$ & $\langle\rangle\ |\ \langle v_1,v_2\rangle\ |\ \lambda x:T.\ e\ |\ \textsf{L }v\ |\ \textsf{R }v$\\[0.5em] 
-Context & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$\\ 
+Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \end{tabular} 
 
 \subsection*{Typing rules}
@@ -73,7 +73,7 @@ Context & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$\\
 (\textsc{I}: introduction rule, \textsc{E}: elimination rule, \textsc{Hyp}: hypothesis)
 \medbreak
 \noindent
-\AxiomC{{\color{white} $\Gamma\vdash\langle\rangle:1$}} % placeholder
+\AxiomC{{\color{white} $\langle\rangle$}} % placeholder
 \RightLabel{\textsc{1I}}
 \UnaryInfC{$\Gamma\vdash\langle\rangle:1$}
 \DisplayProof$\qquad$ %=========================================================
@@ -118,7 +118,7 @@ Context & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$\\
 \AxiomC{$\Gamma,x:X\vdash e_1:T$}
 \AxiomC{$\Gamma,x:X\vdash e_2:T$}
 \RightLabel{\textsc{$+$E}}
-\TrinaryInfC{$\Gamma\vdash\textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2:T$}
+\TrinaryInfC{$\Gamma\vdash\textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2):T$}
 \DisplayProof\bigbreak %========================================================
 \noindent
 (No introduction for 0)$\qquad$
@@ -129,63 +129,134 @@ Context & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$\\
 
 \subsection*{Operational semantics}
 
-%\AxiomC{$n=n_1+n_2$}
-%\RightLabel{\textsc{ op}$+$}
-%\UnaryInfC{$\langle\sigma;n_1+n_2\rangle\leadsto\langle\sigma;n\rangle$}
-%\DisplayProof$\quad$
-%\AxiomC{$b=(n_1<n_2)$}
-%\RightLabel{\textsc{ op}$<$}
-%\UnaryInfC{$\langle\sigma;n_1<n_2\rangle\leadsto\langle\sigma;b\rangle$}
-%\DisplayProof\bigbreak
-%
-%\AxiomC{$\langle\sigma;e_1\rangle\leadsto\langle\sigma';e_1'\rangle$}
-%\RightLabel{\textsc{ op1}}
-%\UnaryInfC{$\langle\sigma;e_1\ op\ e_2\rangle\leadsto\langle\sigma';e_1'\ op\ e_2\rangle$}
-%\DisplayProof$\quad$
-%\AxiomC{$\langle\sigma;e_2\rangle\leadsto\langle\sigma';e_2'\rangle$}
-%\RightLabel{\textsc{ op2}}
-%\UnaryInfC{$\langle\sigma;v\ op\ e_2\rangle\leadsto\langle\sigma';v\ op\ e_2'\rangle$}
-%\DisplayProof\bigbreak
-%
-%\AxiomC{}
-%\RightLabel{\textsc{ if1}}
-%\UnaryInfC{$\langle\sigma;\,\textsf{if true then }e_1\textsf{ else }e_2\rangle\leadsto\langle\sigma;e_1\rangle$}
-%\DisplayProof$\quad$
-%\AxiomC{}
-%\RightLabel{\textsc{ if2}}
-%\UnaryInfC{$\langle\sigma;\,\textsf{if false then }e_1\textsf{ else }e_2\rangle\leadsto\langle\sigma;e_2\rangle$}
-%\DisplayProof\medbreak
-%
-%\AxiomC{$\langle\sigma;e\rangle\leadsto\langle\sigma';e'\rangle$}
-%\RightLabel{\textsc{ if3}}
-%\UnaryInfC{$\langle\sigma;\,\textsf{if }e\textsf{ then }e_1\textsf{ else }e_2\rangle\leadsto\langle\sigma';\,\textsf{if }e'\textsf{ then }e_1\textsf{ else }e_2\rangle$}
-%\DisplayProof\medbreak
-%
-%\AxiomC{$(x,v)\in\sigma$}
-%\RightLabel{\textsc{ lookup}}
-%\UnaryInfC{$\langle\sigma;x\rangle\leadsto\langle\sigma;v\rangle$}
-%\DisplayProof$\quad$
-%\AxiomC{$\langle\sigma;e_0\rangle\leadsto\langle\sigma';e_0'\rangle$}
-%\RightLabel{\textsc{ declare1}}
-%\UnaryInfC{$\langle\sigma;\,\textsf{var }x=e_0\textsf{ in }e_1\rangle\leadsto\langle\sigma';\,\textsf{var }x=e_0'\textsf{ in }e_1\rangle$}
-%\DisplayProof\medbreak
-%
-%\AxiomC{\textcolor{white}{PLACEHOLDER}}
-%\RightLabel{\textsc{ declare2}}
-%\UnaryInfC{$\langle\sigma;\,\textsf{var }x=v\textsf{ in }e_1\rangle\leadsto\langle\sigma;\{v/x\}e_1\rangle$}
-%\DisplayProof$\quad$
-%\AxiomC{$x\in\text{dom}(s)$}
-%\RightLabel{\textsc{ assign1}}
-%\UnaryInfC{$\langle\sigma;x:=v\rangle\leadsto\langle\sigma+\{x\mapsto v\};v\rangle$}
-%\DisplayProof\medbreak
-%
-%\AxiomC{$\langle\sigma;e\rangle\leadsto\langle\sigma';e'\rangle$}
-%\RightLabel{\textsc{ assign2}}
-%\UnaryInfC{$\langle\sigma;x:=e\rangle\leadsto\langle\sigma';x:=e'\rangle$}
-%\DisplayProof$\quad$
-%\AxiomC{$\langle\sigma;e_0\rangle\leadsto\langle\sigma';e_0'\rangle$}
-%\RightLabel{\textsc{ assign3}}
-%\UnaryInfC{$\langle\sigma;e_0:=e_1\rangle\leadsto\langle\sigma';e_0':=e_1\rangle$}
-%\DisplayProof
+(No rule for unit)$\qquad$
+\AxiomC{$e_1\leadsto e_1'$}
+\RightLabel{\textsc{Pair1}}
+\UnaryInfC{$\langle e_1,e_2\rangle\leadsto\langle e_1',e_2\rangle$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$e_2\leadsto e_2'$}
+\RightLabel{\textsc{Pair2}}
+\UnaryInfC{$\langle v,e_2\rangle\leadsto\langle v,e_2'\rangle$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{{\color{white} $\langle\rangle$}} % placeholder
+\RightLabel{\textsc{Proj1}}
+\UnaryInfC{$\textsf{fst }\langle v_1,v_2\rangle\leadsto v_1$}
+\DisplayProof$\quad$ %==========================================================
+\AxiomC{{\color{white} $\langle\rangle$}} % placeholder
+\RightLabel{\textsc{Proj2}}
+\UnaryInfC{$\textsf{snd }\langle v_1,v_2\rangle\leadsto v_2$}
+\DisplayProof$\quad$ %==========================================================
+\AxiomC{$e\leadsto e'$} 
+\RightLabel{\textsc{Proj3}}
+\UnaryInfC{$\textsf{fst }e\leadsto\textsf{fst }e'$}
+\DisplayProof$\quad$ %==========================================================
+\AxiomC{$e\leadsto e'$} 
+\RightLabel{\textsc{Proj4}}
+\UnaryInfC{$\textsf{snd }e\leadsto\textsf{snd }e'$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$e\leadsto e'$} 
+\RightLabel{\textsc{Sum1}}
+\UnaryInfC{$\textsf{L }e\leadsto\textsf{L }e'$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$e\leadsto e'$} 
+\RightLabel{\textsc{Sum2}}
+\UnaryInfC{$\textsf{R }e\leadsto\textsf{R }e'$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$e\leadsto e'$} 
+\RightLabel{\textsc{Case1}}
+\UnaryInfC{$\textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2)\leadsto\textsf{case}(e',\textsf{L }x\to e_1,\textsf{R }y\to e_2)$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{{\color{white} $[]$}} %placeholder
+\RightLabel{\textsc{Case2}}
+\UnaryInfC{$\textsf{case}(\textsf{L }v,\textsf{L }x\to e_1,\textsf{R }y\to e_2)\leadsto[v/x]e_1$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{{\color{white} $[]$}} %placeholder
+\RightLabel{\textsc{Case3}}
+\UnaryInfC{$\textsf{case}(\textsf{R }v,\textsf{L }x\to e_1,\textsf{R }y\to e_2)\leadsto[v/y]e_2$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$e_1\leadsto e_1'$}
+\RightLabel{\textsc{App1}}
+\UnaryInfC{$e_1\ e_2\leadsto e_1'\ e_2$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$e_2\leadsto e_2'$}
+\RightLabel{\textsc{App2}}
+\UnaryInfC{$v\ e_2\leadsto v\ e_2'$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{{\color{white} $[]$}} %placeholder
+\RightLabel{\textsc{Fn}}
+\UnaryInfC{$(\lambda x:T.\ e)\ v\leadsto[v/x]e$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$e\leadsto e'$} 
+\RightLabel{\textsc{Abort}}
+\UnaryInfC{$\textsf{abort }e\leadsto\textsf{abort }e'$}
+\DisplayProof\newpage %=========================================================
 
+\subsection{Polymorphic $\lambda$-Calculus}
+
+\subsection*{Syntax}
+
+\hspace{-1em}
+\begin{tabular}{lccl}
+Types   & $T$ & $::=$ & $\tau\ |\ T_1\to T_2\ |\ \forall\alpha.\ T$\\[0.5em]
+Terms   & $e$ & $::=$ & $x\ |\ \lambda x:T.\ e\ |\ e_1\ e_2\ |\ \Lambda\tau.\ e\ |\ e\ T$\\[0.5em]
+Values  & $v$ & $::=$ & $\lambda x:T.\ e\ |\ \Lambda\tau.\ e$\\[0.5em] 
+Type Contexts & $\Theta$ & $::=$ & $\cdot\ |\ \Theta,\tau$\\[0.5em] 
+Term Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
+\end{tabular} 
+
+\subsection*{Well-formedness of types}
+
+\vspace{0.5em}
+\AxiomC{$\tau\in\Theta$} 
+\UnaryInfC{$\Theta\vdash\tau\text{ type}$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Theta\vdash T_1\text{ type}$} 
+\AxiomC{$\Theta\vdash T_2\text{ type}$} 
+\BinaryInfC{$\Theta\vdash T_1\to T_2\text{ type}$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Theta,\tau\vdash T\text{ type}$} 
+\UnaryInfC{$\Theta\vdash\forall\tau.\ T\text{ type}$}
+\DisplayProof
+
+\subsection*{Well-formedness of term contexts}
+
+\vspace{0.5em}
+\AxiomC{{\color{white} $\Theta\vdash\Gamma$}} %placeholder 
+\UnaryInfC{$\Theta\vdash\cdot\text{ ctx}$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Theta\vdash\Gamma\text{ ctx}$} 
+\AxiomC{$\Theta\vdash T\text{ type}$} 
+\BinaryInfC{$\Theta\vdash\Gamma,x:T\text{ ctx}$}
+\DisplayProof
+
+\subsection*{Typing rules}
+
+\vspace{0.5em}
+\AxiomC{$x:T\in\Gamma$} 
+\UnaryInfC{$\Theta;\Gamma\vdash x:T$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Theta\vdash T\text{ type}$} 
+\AxiomC{$\Theta;\Gamma,x:T\vdash e:T'$} 
+\BinaryInfC{$\Theta;\Gamma\vdash\lambda x:T.\ e:T\to T'$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Theta;\Gamma\vdash e_1:T\to T'$}
+\AxiomC{$\Theta;\Gamma\vdash e_2:T$}
+\BinaryInfC{$\Theta;\Gamma\vdash e_1\ e_2:T'$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$\Theta,\tau;\Gamma\vdash e:T'$} 
+\UnaryInfC{$\Theta;\Gamma\vdash\Lambda\tau.\ e:\forall\tau.\ T'$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Theta;\Gamma\vdash e:\forall\tau.\ T'$}
+\AxiomC{$\Theta\vdash T\text{ type}$}
+\BinaryInfC{$\Theta;\Gamma\vdash e\ T:[T/\tau]T'$}
+\DisplayProof
+
+\subsection*{Operational semantics}
 \end{document}
