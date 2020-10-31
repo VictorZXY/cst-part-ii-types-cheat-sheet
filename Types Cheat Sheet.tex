@@ -54,5 +54,138 @@
 \MyAuthor
 
 \justifying
-\subsection{Simply-typed $\lambda$-calculus}
+
+\subsection{Simply-Typed $\lambda$-Calculus}
+
+\subsection*{Syntax}
+
+\hspace{-1em}
+\begin{tabular}{lccl}
+Types   & $T$ & $::=$ & $1\ |\ 0\ |\ T_1\times T_2\ |\ T_1+T_2\ |\ T_1\to T_2$\\[0.5em]
+Terms   & $e$ & $::=$ & $x\ |\ \langle\rangle\ |\ \langle e_1,e_2\rangle\ |\ \textsf{fst }e\ |\ \textsf{snd }e\ |\ \textsf{L }e\ |\ \textsf{R }e\ |\ \textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2)$\\ 
+        & {}  & $|$   & $\lambda x:T.\ e\ |\ e_1\ e_2\ |\ \textsf{abort}$\\[0.5em]
+Values  & $v$ & $::=$ & $\langle\rangle\ |\ \langle v_1,v_2\rangle\ |\ \lambda x:T.\ e\ |\ \textsf{L }v\ |\ \textsf{R }v$\\[0.5em] 
+Context & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$\\ 
+\end{tabular} 
+
+\subsection*{Typing rules}
+
+(\textsc{I}: introduction rule, \textsc{E}: elimination rule, \textsc{Hyp}: hypothesis)
+\medbreak
+\noindent
+\AxiomC{{\color{white} $\Gamma\vdash\langle\rangle:1$}} % placeholder
+\RightLabel{\textsc{1I}}
+\UnaryInfC{$\Gamma\vdash\langle\rangle:1$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Gamma\vdash e_1:T_1$}
+\AxiomC{$\Gamma\vdash e_2:T_2$}
+\RightLabel{\textsc{$\times$I}}
+\BinaryInfC{$\Gamma\vdash\langle e_1, e_2\rangle:1$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Gamma\vdash e:T_1\times T_2$} 
+\RightLabel{\textsc{$\times$E$_1$}}
+\UnaryInfC{$\Gamma\vdash\textsf{fst }e:T_1$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Gamma\vdash e:T_1\times T_2$} 
+\RightLabel{\textsc{$\times$E$_2$}}
+\UnaryInfC{$\Gamma\vdash\textsf{snd }e:T_2$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$x:T\in\Gamma$} 
+\RightLabel{\textsc{Hyp}}
+\UnaryInfC{$\Gamma\vdash x:T$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Gamma,x:T\vdash e:T'$} 
+\RightLabel{\textsc{$\to$I}}
+\UnaryInfC{$\Gamma\vdash\lambda x:T.\ e:T\to T'$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Gamma\vdash e_1:T\to T'$}
+\AxiomC{$\Gamma\vdash e_2:T$}
+\RightLabel{\textsc{$\to$E}}
+\BinaryInfC{$\Gamma\vdash e_1\ e_2:T'$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$\Gamma\vdash e:T_1$} 
+\RightLabel{\textsc{$+$I$_1$}}
+\UnaryInfC{$\Gamma\vdash\textsf{L }e:T_1+T_2$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$\Gamma\vdash e:T_2$} 
+\RightLabel{\textsc{$+$I$_2$}}
+\UnaryInfC{$\Gamma\vdash\textsf{R }e:T_1+T_2$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$\Gamma\vdash e:T_1+T_2$}
+\AxiomC{$\Gamma,x:X\vdash e_1:T$}
+\AxiomC{$\Gamma,x:X\vdash e_2:T$}
+\RightLabel{\textsc{$+$E}}
+\TrinaryInfC{$\Gamma\vdash\textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2:T$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+(No introduction for 0)$\qquad$
+\AxiomC{$\Gamma\vdash e:0$} 
+\RightLabel{\textsc{0E}}
+\UnaryInfC{$\Gamma\vdash\textsf{abort }e:T$}
+\DisplayProof
+
+\subsection*{Operational semantics}
+
+%\AxiomC{$n=n_1+n_2$}
+%\RightLabel{\textsc{ op}$+$}
+%\UnaryInfC{$\langle\sigma;n_1+n_2\rangle\leadsto\langle\sigma;n\rangle$}
+%\DisplayProof$\quad$
+%\AxiomC{$b=(n_1<n_2)$}
+%\RightLabel{\textsc{ op}$<$}
+%\UnaryInfC{$\langle\sigma;n_1<n_2\rangle\leadsto\langle\sigma;b\rangle$}
+%\DisplayProof\bigbreak
+%
+%\AxiomC{$\langle\sigma;e_1\rangle\leadsto\langle\sigma';e_1'\rangle$}
+%\RightLabel{\textsc{ op1}}
+%\UnaryInfC{$\langle\sigma;e_1\ op\ e_2\rangle\leadsto\langle\sigma';e_1'\ op\ e_2\rangle$}
+%\DisplayProof$\quad$
+%\AxiomC{$\langle\sigma;e_2\rangle\leadsto\langle\sigma';e_2'\rangle$}
+%\RightLabel{\textsc{ op2}}
+%\UnaryInfC{$\langle\sigma;v\ op\ e_2\rangle\leadsto\langle\sigma';v\ op\ e_2'\rangle$}
+%\DisplayProof\bigbreak
+%
+%\AxiomC{}
+%\RightLabel{\textsc{ if1}}
+%\UnaryInfC{$\langle\sigma;\,\textsf{if true then }e_1\textsf{ else }e_2\rangle\leadsto\langle\sigma;e_1\rangle$}
+%\DisplayProof$\quad$
+%\AxiomC{}
+%\RightLabel{\textsc{ if2}}
+%\UnaryInfC{$\langle\sigma;\,\textsf{if false then }e_1\textsf{ else }e_2\rangle\leadsto\langle\sigma;e_2\rangle$}
+%\DisplayProof\medbreak
+%
+%\AxiomC{$\langle\sigma;e\rangle\leadsto\langle\sigma';e'\rangle$}
+%\RightLabel{\textsc{ if3}}
+%\UnaryInfC{$\langle\sigma;\,\textsf{if }e\textsf{ then }e_1\textsf{ else }e_2\rangle\leadsto\langle\sigma';\,\textsf{if }e'\textsf{ then }e_1\textsf{ else }e_2\rangle$}
+%\DisplayProof\medbreak
+%
+%\AxiomC{$(x,v)\in\sigma$}
+%\RightLabel{\textsc{ lookup}}
+%\UnaryInfC{$\langle\sigma;x\rangle\leadsto\langle\sigma;v\rangle$}
+%\DisplayProof$\quad$
+%\AxiomC{$\langle\sigma;e_0\rangle\leadsto\langle\sigma';e_0'\rangle$}
+%\RightLabel{\textsc{ declare1}}
+%\UnaryInfC{$\langle\sigma;\,\textsf{var }x=e_0\textsf{ in }e_1\rangle\leadsto\langle\sigma';\,\textsf{var }x=e_0'\textsf{ in }e_1\rangle$}
+%\DisplayProof\medbreak
+%
+%\AxiomC{\textcolor{white}{PLACEHOLDER}}
+%\RightLabel{\textsc{ declare2}}
+%\UnaryInfC{$\langle\sigma;\,\textsf{var }x=v\textsf{ in }e_1\rangle\leadsto\langle\sigma;\{v/x\}e_1\rangle$}
+%\DisplayProof$\quad$
+%\AxiomC{$x\in\text{dom}(s)$}
+%\RightLabel{\textsc{ assign1}}
+%\UnaryInfC{$\langle\sigma;x:=v\rangle\leadsto\langle\sigma+\{x\mapsto v\};v\rangle$}
+%\DisplayProof\medbreak
+%
+%\AxiomC{$\langle\sigma;e\rangle\leadsto\langle\sigma';e'\rangle$}
+%\RightLabel{\textsc{ assign2}}
+%\UnaryInfC{$\langle\sigma;x:=e\rangle\leadsto\langle\sigma';x:=e'\rangle$}
+%\DisplayProof$\quad$
+%\AxiomC{$\langle\sigma;e_0\rangle\leadsto\langle\sigma';e_0'\rangle$}
+%\RightLabel{\textsc{ assign3}}
+%\UnaryInfC{$\langle\sigma;e_0:=e_1\rangle\leadsto\langle\sigma';e_0':=e_1\rangle$}
+%\DisplayProof
+
 \end{document}
