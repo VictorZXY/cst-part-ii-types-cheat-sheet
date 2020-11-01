@@ -197,15 +197,15 @@ Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \UnaryInfC{$\textsf{abort }e\leadsto\textsf{abort }e'$}
 \DisplayProof\newpage %=========================================================
 
-\subsection{Polymorphic $\lambda$-Calculus}
+\subsection{Polymorphic $\lambda$-Calculus (System F)}
 
 \subsection*{Syntax}
 
 \hspace{-1em}
 \begin{tabular}{lccl}
-Types   & $T$ & $::=$ & $\tau\ |\ T_1\to T_2\ |\ \forall\alpha.\ T$\\[0.5em]
-Terms   & $e$ & $::=$ & $x\ |\ \lambda x:T.\ e\ |\ e_1\ e_2\ |\ \Lambda\tau.\ e\ |\ e\ T$\\[0.5em]
-Values  & $v$ & $::=$ & $\lambda x:T.\ e\ |\ \Lambda\tau.\ e$\\[0.5em] 
+Types   & $T$ & $::=$ & $\tau\ |\ T_1\to T_2\ |\ \forall\tau.\ T\ |\ \exists\tau.\ T$\\[0.5em]
+Terms   & $e$ & $::=$ & $x\ |\ \lambda x:T.\ e\ |\ e_1\ e_2\ |\ \Lambda\tau.\ e\ |\ e\ T\ |\ \textsf{pack}_{\tau.T'}(T,e)\ |\ \textsf{let pack}(\tau,x)=e\textsf{ in }e'$\\[0.5em]
+Values  & $v$ & $::=$ & $\lambda x:T.\ e\ |\ \Lambda\tau.\ e\ |\ \textsf{pack}_{\tau.T'}(T,v)$\\[0.5em] 
 Type Contexts & $\Theta$ & $::=$ & $\cdot\ |\ \Theta,\tau$\\[0.5em] 
 Term Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \end{tabular} 
@@ -239,24 +239,145 @@ Term Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 
 \vspace{0.5em}
 \AxiomC{$x:T\in\Gamma$} 
+\RightLabel{\textsc{Hyp}}
 \UnaryInfC{$\Theta;\Gamma\vdash x:T$}
-\DisplayProof$\qquad$ %=========================================================
+\DisplayProof$\qquad$ %==========================================================
 \AxiomC{$\Theta\vdash T\text{ type}$} 
 \AxiomC{$\Theta;\Gamma,x:T\vdash e:T'$} 
+\RightLabel{\textsc{$\to$I}}
 \BinaryInfC{$\Theta;\Gamma\vdash\lambda x:T.\ e:T\to T'$}
-\DisplayProof$\qquad$ %=========================================================
+\DisplayProof\bigbreak %========================================================
+\noindent
 \AxiomC{$\Theta;\Gamma\vdash e_1:T\to T'$}
 \AxiomC{$\Theta;\Gamma\vdash e_2:T$}
+\RightLabel{\textsc{$\to$E}}
 \BinaryInfC{$\Theta;\Gamma\vdash e_1\ e_2:T'$}
 \DisplayProof\bigbreak %========================================================
 \noindent
 \AxiomC{$\Theta,\tau;\Gamma\vdash e:T'$} 
+\RightLabel{\textsc{$\forall$I}}
 \UnaryInfC{$\Theta;\Gamma\vdash\Lambda\tau.\ e:\forall\tau.\ T'$}
 \DisplayProof$\qquad$ %=========================================================
 \AxiomC{$\Theta;\Gamma\vdash e:\forall\tau.\ T'$}
 \AxiomC{$\Theta\vdash T\text{ type}$}
+\RightLabel{\textsc{$\forall$E}}
 \BinaryInfC{$\Theta;\Gamma\vdash e\ T:[T/\tau]T'$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$\Theta,\tau\vdash T'\text{ type}$} 
+\AxiomC{$\Theta\vdash T\text{ type}$}
+\AxiomC{$\Theta;\Gamma\vdash e:[T/\tau]T'$} 
+\RightLabel{\textsc{$\exists$I}}
+\TrinaryInfC{$\Theta;\Gamma\vdash\textsf{pack}_{\tau.T'}(T,e):\exists\tau.\ T'$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$\Theta;\Gamma\vdash e:\exists\tau.\ T$} 
+\AxiomC{$\Theta,\tau;\Gamma,x:T\vdash e':T'$}
+\AxiomC{$\Theta\vdash T'\text{ type}$} 
+\RightLabel{\textsc{$\exists$E}}
+\TrinaryInfC{$\Theta;\Gamma\vdash\textsf{let pack}(\tau,x)=e\textsf{ in }e':T'$}
 \DisplayProof
 
 \subsection*{Operational semantics}
+
+(\textsc{Cong}: congruence rule, \textsc{Eval}: evaluation rule)
+\medbreak
+\noindent
+\AxiomC{$e_1\leadsto e_1'$}
+\RightLabel{\textsc{CongFun}}
+\UnaryInfC{$e_1\ e_2\leadsto e_1'\ e_2$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{$e_2\leadsto e_2'$}
+\RightLabel{\textsc{CongFunArg}}
+\UnaryInfC{$v\ e_2\leadsto v\ e_2'$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{{\color{white} $[]$}} %placeholder
+\RightLabel{\textsc{FunEval}}
+\UnaryInfC{$(\lambda x:T.\ e)\ v\leadsto[v/x]e$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$e\leadsto e'$}
+\RightLabel{\textsc{CongForall}}
+\UnaryInfC{$e\ T\leadsto e'\ T$}
+\DisplayProof$\qquad$ %=========================================================
+\AxiomC{{\color{white} $[]$}} %placeholder
+\RightLabel{\textsc{ForallEval}}
+\UnaryInfC{$(\Lambda\tau.\ e)\ T\leadsto[T/\tau]e$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$e\leadsto e'$}
+\RightLabel{\textsc{CongExists}}
+\UnaryInfC{$\textsf{pack}_{\tau.T'}(T,e)\leadsto\textsf{pack}_{\tau.T'}(T,e')$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{$e_1\leadsto e_1'$}
+\RightLabel{\textsc{CongExistsUnpack}}
+\UnaryInfC{$\textsf{let pack}(\tau,x)=e_1\textsf{ in }e_2\leadsto\textsf{let pack}(\tau,x)=e_1'\textsf{ in }e_2$}
+\DisplayProof\bigbreak %========================================================
+\noindent
+\AxiomC{{\color{white} $[]$}} %placeholder
+\RightLabel{\textsc{ExistsEval}}
+\UnaryInfC{$\textsf{let pack}(\tau,x)=\textsf{pack}_{\tau.T'}(T,v)\textsf{ in }e\leadsto [T/\tau,v/x]e$}
+\DisplayProof
+
+\subsection*{Church encodings}
+
+\subsubsection*{Pairs}
+
+\hspace{-1em}
+\begin{tabular}{lcl}
+$T_1\times T_2$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\forall\tau.\ (T_1\to T_2\to\tau)\to\tau$\\[0.5em]
+$\langle e_1,e_2\rangle$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda k:T_1\to T_2\to\tau.\ k\ e\ e'$\\[0.5em]
+\textsf{fst }$e$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$e\ T_1\ (\lambda x:T_1.\ \lambda y:T_2.\ x)$\\[0.5em]
+\textsf{snd }$e$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$e\ T_2\ (\lambda x:T_1.\ \lambda y:T_2.\ y)$
+\end{tabular}
+
+\subsubsection*{Sums}
+
+\hspace{-1em}
+\begin{tabular}{lcl}
+$T_1+T_2$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\forall\tau.\ (T_1\to\tau)\to(T_2\to\tau)\to\tau$\\[0.5em]
+\textsf{L }$e$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda f:T_1\to\tau.\ \lambda g:T_2\to\tau.\ f\ e$\\[0.5em]
+\textsf{R }$e$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda f:T_1\to\tau.\ \lambda g:T_2\to\tau.\ g\ e$\\[0.5em]
+\end{tabular}\\
+$\textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2):T\ \triangleq\ e\ T\ (\lambda x:T_1\to T.\ e_1)\ (\lambda y:T_2\to T.\ e_2)$
+
+\subsubsection*{Existential types}
+
+$\exists\tau.\ T'\ \triangleq\ \forall\pi.\ (\forall\tau.\ T'\to\pi)\to\pi$\medbreak
+\noindent
+$\textsf{pack}_{\tau.T'}(T,e)\ \triangleq\ \Lambda\pi.\ \lambda k:\forall\tau.\ T'\to\pi.\ k\ T\ e$\medbreak
+\noindent
+$\textsf{let pack}(\tau,x)=e\textsf{ in }e':T'\ \triangleq\ e\ T'\ (\Lambda\tau.\ \lambda x:T.\ e')$
+
+\subsubsection*{Booleans}
+
+\hspace{-1em}
+\begin{tabular}{lcl}
+\textsf{bool} & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\forall\tau.\ \tau\to\tau\to\tau$\\[0.5em]
+\textsf{True} & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda x:\tau.\ \lambda y:\tau.\ x$\\[0.5em]
+\textsf{False} & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda x:\tau.\ \lambda y:\tau.\ y$\\[0.5em]
+\end{tabular}\\
+\textsf{if }$e$\textsf{ then }$e_1$\textsf{ else }$e_2:T\ \triangleq\ e\ T\ e_1\ e_2$
+
+\subsubsection*{Natural numbers}
+
+\hspace{-1em}
+\begin{tabular}{lcl}
+$\mathbb{N}$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\forall\tau.\ \tau\to(\tau\to\tau)\to\tau$\\[0.5em]
+\textsf{zero} & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda z:\tau.\ \lambda s:\tau\to\tau.\ z$\\[0.5em]
+\textsf{succ}$(e)$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda z:\tau.\ \lambda s:\tau\to\tau.\ s\ (e\ \tau\ z\ s)$\\[0.5em]
+\end{tabular}\\
+$\textsf{iter}(e,\textsf{zero}\to e_\textsf{z},\textsf{succ}(x)\to e_\textsf{s}):T\ \triangleq\ e\ T\ e_\textsf{z}\ (\lambda x:T.\ e_\textsf{s})$
+
+\subsubsection*{Lists}
+
+\hspace{-1em}
+\begin{tabular}{lcl}
+\textsf{list }$T$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\forall\tau.\ \tau\to(T\to\tau\to\tau)\to\tau$\\[0.5em]
+$[]$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda n:\tau.\ \lambda c:T\to\tau\to\tau.\ n$\\[0.5em]
+$e::e'$ & \hspace{-0.5em}$\triangleq$ & \hspace{-0.5em}$\Lambda\tau.\ \lambda n:\tau.\ \lambda c:T\to\tau\to\tau.\ c\ e\ (e'\ \tau\ n\ c)$\\[0.5em]
+\end{tabular}\\
+$\textsf{fold}(e,[]\to e_\textsf{n},x::r\to e_\textsf{c}):T'\ \triangleq\ e\ T'\ e_\textsf{n}\ (\lambda x:T.\ \lambda r:T'.\ e_\textsf{c})$
+
 \end{document}
