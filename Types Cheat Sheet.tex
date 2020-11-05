@@ -204,8 +204,9 @@ Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \hspace{-1em}
 \begin{tabular}{lccl}
 Types   & $T$ & $::=$ & $\alpha\ |\ T_1\to T_2\ |\ \forall\alpha.\ T\ |\ \exists\alpha.\ T$\\[0.5em]
-Terms   & $e$ & $::=$ & $x\ |\ \lambda x:T.\ e\ |\ e_1\ e_2\ |\ \Lambda\alpha.\ e\ |\ e\ T\ |\ \textsf{pack}_{\alpha.T'}(T,e)\ |\ \textsf{let pack}(\alpha,x)=e\textsf{ in }e'$\\[0.5em]
-Values  & $v$ & $::=$ & $\lambda x:T.\ e\ |\ \Lambda\alpha.\ e\ |\ \textsf{pack}_{\alpha.T'}(T,v)$\\[0.5em] 
+Terms   & $e$ & $::=$ & $x\ |\ \lambda x:T.\ e\ |\ e_1\ e_2\ |\ \Lambda\alpha.\ e\ |\ e\ T\ |\ \textsf{pack}_{\alpha_\text{abs}.T_\text{sig}}(T_\text{conc},e_\text{impl})$\\
+{}      & {}  &  $|$  & $\textsf{let pack}(\alpha,x)=e_\text{impl}\textsf{ in }e_\text{use}$\\[0.5em]
+Values  & $v$ & $::=$ & $\lambda x:T.\ e\ |\ \Lambda\alpha.\ e\ |\ \textsf{pack}_{\alpha_\text{abs}.T_\text{sig}}(T_\text{conc},v_\text{impl})$\\[0.5em] 
 Type Contexts & $\Theta$ & $::=$ & $\cdot\ |\ \Theta,\alpha$\\[0.5em] 
 Term Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \end{tabular} 
@@ -264,18 +265,18 @@ Term Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \BinaryInfC{$\Theta;\Gamma\vdash e\ T:[T/\alpha]T'$}
 \DisplayProof\bigbreak %========================================================
 \noindent
-\AxiomC{$\Theta,\alpha\vdash T'\textsf{ type}$} 
-\AxiomC{$\Theta\vdash T\textsf{ type}$}
-\AxiomC{$\Theta;\Gamma\vdash e:[T/\alpha]T'$} 
+\AxiomC{$\Theta,\alpha_\text{abs}\vdash T_\text{sig}\textsf{ type}$} 
+\AxiomC{$\Theta\vdash T_\text{conc}\textsf{ type}$}
+\AxiomC{$\Theta;\Gamma\vdash e_\text{impl}:[T_\text{conc}/\alpha_\text{abs}]T_\text{sig}$} 
 \RightLabel{\textsc{$\exists$I}}
-\TrinaryInfC{$\Theta;\Gamma\vdash\textsf{pack}_{\alpha.T'}(T,e):\exists\alpha.\ T'$}
+\TrinaryInfC{$\Theta;\Gamma\vdash\textsf{pack}_{\alpha_\text{abs}.T_\text{sig}}(T_\text{conc},e_\text{impl}):\exists\alpha_\text{abs}.\ T_\text{sig}$}
 \DisplayProof\bigbreak %========================================================
 \noindent
-\AxiomC{$\Theta;\Gamma\vdash e:\exists\alpha.\ T$} 
-\AxiomC{$\Theta,\alpha;\Gamma,x:T\vdash e':T'$}
-\AxiomC{$\Theta\vdash T'\textsf{ type}$} 
+\AxiomC{$\Theta;\Gamma\vdash e_\text{impl}:\exists\alpha_\text{abs}.\ T_\text{sig}$} 
+\AxiomC{$\Theta,\alpha;\Gamma,x:[\alpha_\text{abs}/\alpha]T_\text{sig}\vdash e_\text{use}:T_\text{use}$}
+\AxiomC{$\Theta\vdash T_\text{use}\textsf{ type}$} 
 \RightLabel{\textsc{$\exists$E}}
-\TrinaryInfC{$\Theta;\Gamma\vdash\textsf{let pack}(\alpha,x)=e\textsf{ in }e':T'$}
+\TrinaryInfC{$\Theta;\Gamma\vdash\textsf{let pack}(\alpha,x)=e_\text{impl}\textsf{ in }e_\text{use}:T_\text{use}$}
 \DisplayProof
 
 \subsection*{Operational semantics}
@@ -305,19 +306,19 @@ Term Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \UnaryInfC{$(\Lambda\alpha.\ e)\ T\leadsto[T/\alpha]e$}
 \DisplayProof\bigbreak %========================================================
 \noindent
-\AxiomC{$e\leadsto e'$}
+\AxiomC{$e_\text{impl}\leadsto e'_\text{impl}$}
 \RightLabel{\textsc{CongExists}}
-\UnaryInfC{$\textsf{pack}_{\alpha.T'}(T,e)\leadsto\textsf{pack}_{\alpha.T'}(T,e')$}
+\UnaryInfC{$\textsf{pack}_{\alpha_\text{abs}.T_\text{sig}}(T_\text{conc},e_\text{impl})\leadsto\textsf{pack}_{\alpha_\text{abs}.T_\text{sig}}(T_\text{conc},e'_\text{impl})$}
 \DisplayProof\bigbreak %========================================================
 \noindent
-\AxiomC{$e_1\leadsto e_1'$}
+\AxiomC{$e_\text{impl}\leadsto e'_\text{impl}$}
 \RightLabel{\textsc{CongExistsUnpack}}
-\UnaryInfC{$\textsf{let pack}(\alpha,x)=e_1\textsf{ in }e_2\leadsto\textsf{let pack}(\alpha,x)=e_1'\textsf{ in }e_2$}
+\UnaryInfC{$\textsf{let pack}(\alpha,x)=e_\text{impl}\textsf{ in }e_\text{use}\leadsto\textsf{let pack}(\alpha,x)=e'_\text{impl}\textsf{ in }e_\text{use}$}
 \DisplayProof\bigbreak %========================================================
 \noindent
 \AxiomC{{\color{white} $[]$}} %placeholder
 \RightLabel{\textsc{ExistsEval}}
-\UnaryInfC{$\textsf{let pack}(\alpha,x)=\textsf{pack}_{\alpha.T'}(T,v)\textsf{ in }e\leadsto [T/\alpha,v/x]e$}
+\UnaryInfC{$\textsf{let pack}(\alpha,x)=\textsf{pack}_{\alpha_\text{abs}.T_\text{sig}}(T_\text{conc},v_\text{impl})\textsf{ in }e_\text{use}\leadsto [T_\text{conc}/\alpha,v_\text{impl}/x]e_\text{use}$}
 \DisplayProof
 
 \subsection*{Church encodings}
@@ -344,11 +345,11 @@ $\textsf{case}(e,\textsf{L }x\to e_1,\textsf{R }y\to e_2):T\ \triangleq\ e\ T\ (
 
 \subsubsection*{Existential types}
 
-$\exists\alpha.\ T'\ \triangleq\ \forall\beta.\ (\forall\alpha.\ T'\to\beta)\to\beta$\medbreak
+$\exists\alpha.\ T_\text{sig}\ \triangleq\ \forall\beta.\ (\forall\alpha.\ T_\text{sig}\to\beta)\to\beta$\medbreak
 \noindent
-$\textsf{pack}_{\alpha.T'}(T,e)\ \triangleq\ \Lambda\beta.\ \lambda k:\forall\alpha.\ T'\to\beta.\ k\ T\ e$\medbreak
+$\textsf{pack}_{\alpha_\text{abs}.T_\text{sig}}(T_\text{conc},e_\text{impl})\ \triangleq\ \Lambda\beta.\ \lambda k:\forall\alpha_\text{abs}.\ T_\text{sig}\to\beta.\ k\ T_\text{conc}\ e_\text{impl}$\medbreak
 \noindent
-$\textsf{let pack}(\alpha,x)=e\textsf{ in }e':T'\ \triangleq\ e\ T'\ (\Lambda\alpha.\ \lambda x:T.\ e')$
+$\textsf{let pack}(\alpha,x)=e_\text{impl}\textsf{ in }e_\text{use}:T_\text{use}\ \triangleq\ e_\text{impl}\ T_\text{use}\ (\Lambda\alpha.\ \lambda x:T_\text{sig}.\ e_\text{use})$
 
 \subsubsection*{Booleans}
 
