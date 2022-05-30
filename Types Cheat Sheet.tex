@@ -82,7 +82,7 @@ Contexts & $\Gamma$ & $::=$ & $\cdot\ |\ \Gamma,x:T$
 \AxiomC{$\Gamma\vdash e_1:T_1$}
 \AxiomC{$\Gamma\vdash e_2:T_2$}
 \RightLabel{\textsc{$\times$I}}
-\BinaryInfC{$\Gamma\vdash\langle e_1, e_2\rangle:1$}
+\BinaryInfC{$\Gamma\vdash\langle e_1, e_2\rangle:T_1\times T_2$}
 \DisplayProof$\qquad$ %=========================================================
 \AxiomC{$\Gamma\vdash e:T_1\times T_2$} 
 \RightLabel{\textsc{$\times$E$_1$}}
